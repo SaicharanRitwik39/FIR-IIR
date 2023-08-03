@@ -45,15 +45,15 @@ with st.sidebar:
      ('FIR Filter', 'IIR Filter', 'FFT Algorithm'))
     
     
-#FIR Filter Code. Lines 48-60.
+#FIR Filter Code. Lines 48-119.
 if(options == 'FIR Filter'):
     st.title("FIR Filter")
     
     st.write("***")
     
-    with st.expander("FILTER TYPE"):
+    with st.expander("WINDOW TYPE"):
          typeoffilter = st.radio(
-              'Choose the type of Filter:',
+              'Choose the type of Window:',
          ('hamming', 'boxcar', 'triang', 'nuttall', 'hann', 'blackman', 'bartlett'))
     
     numtaps = st.number_input("Enter the length of the filter:", value = 3)
@@ -62,17 +62,17 @@ if(options == 'FIR Filter'):
     'Choose True for Low Pass Filter, False for High Pass Filter',
     (True, False))
     
-    st.subheader("Signal Processing:")
-    st.write("Enter the input signal as a sine function of 't'. For example: 2 * np.sin(2 * np.pi * 5 * t)")
-    input_function = st.text_area("Enter the sine function:", "2 * np.sin(2 * np.pi * 5 * t)")
+    #st.subheader("Signal Processing:")
+    #st.write("Enter the input signal as a sine function of 't'. For example: 2 * np.sin(2 * np.pi * 5 * t)")
+    #input_function = st.text_area("Enter the sine function:", "2 * np.sin(2 * np.pi * 5 * t)")
     
     # Time vector for the input signal
-    t = np.linspace(0, 1, 1000)
+    #t = np.linspace(0, 1, 1000)
     
-    input_signal = eval(input_function)
+    #input_signal = eval(input_function)
     
-    #input_signal_str = st.text_area("Enter the input signal (comma-separated values):", "1, 2, 3, 4, 5")
-    #input_signal = np.fromstring(input_signal_str, dtype=float, sep=',')
+    input_signal_str = st.text_area("Enter the input signal (comma-separated values):", "1, 2, 3, 4, 5")
+    input_signal = np.fromstring(input_signal_str, dtype=float, sep=',')
     
     window = typeoffilter
     firfiltertaps = signal.firwin(numtaps, cutoff, window=window, pass_zero=passzero)
@@ -117,6 +117,51 @@ if(options == 'FIR Filter'):
     ax.plot(output_signal, label='Output Signal')
     ax.legend()
     st.pyplot(fig)
+    
 
+if(options == 'IIR Filter'):
+    st.title("IIR Filter")  
+    
+    with st.expander("IIR FILTER"):
+         ftype = st.radio(
+              'Choose the type of Window:',
+         ('butter', 'cheby1', 'cheby2', 'ellip', 'bessel'))
+    with st.expander("IIR FILTER TYPE"):
+         btype = st.radio(
+              'Choose the type of Window:',
+         ('band', 'lowpass', 'highpass', 'bandstop'))  
+    with st.expander("FILTER FORM OF THE OUTPUT"):
+         output = st.radio(
+              'Choose the Filter Form of the Output:',
+         ('ba', 'zpk', 'sos'))        
+            
+    if (ftype == 'cheby1' or ftype == 'cheby2' or ftype == 'ellip'):
+        rp = st.number_input("Enter the maximum ripple in the passband (dB):")
+        rs = st.number_input("Enter the minimum attenuation in the stopband (dB):", 60)
+    N = st.number_input("Enter the order of the Filter:", value = 17)
+    Wn = st.text_area("Enter the critical frequencies (comma-separated values):", "314.159265359,  1256.63706144")
+    Wn_signal = np.fromstring(Wn, dtype=float, sep=',')
+    analog = st.selectbox(
+    'Choose True for Analog Filter, False for Digital Filter',
+    (True, False))
+    
+    if (analog == True):
+        b, a = signal.iirfilter(N, Wn_signal, rs=rs,
+                           btype=btype, analog=analog, ftype=ftype)
+        w, h = signal.freqs(b, a, 1000)
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        ax.semilogx(w / (2*np.pi), 20 * np.log10(np.maximum(abs(h), 1e-5)))
+        ax.set_xlabel('Frequency [Hz]')
+        ax.set_ylabel('Amplitude [dB]')
+        ax.axis((10, 1000, -100, 10))
+        ax.grid(which='both', axis='both')
+        ax.legend()
+        st.pyplot(fig)
+
+    
+#FFT Code. Lines 123-.    
+if(options == 'FFT Algorithm'):
+    st.title("Fast Fourier Transform")
 
 #https://scipy.github.io/old-wiki/pages/Cookbook/FIRFilter.html    
