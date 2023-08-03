@@ -1,4 +1,4 @@
-module baugh_multi(a,b,p);
+module baugh_mult(a,b,p);
   input [3:0] a,b;
   output [7:0] p;
   supply1 one;
@@ -27,15 +27,15 @@ endmodule
 module half_adder(x,y,s,cout);
   input x,y;
   output s,cout;
-  assign s = x^y^cin;
-  assign cout == (x&y)|(y&cin)|(x&cin);
+  assign s = x^y;
+  assign cout = x&y;
 endmodule
 
 module full_adder(x,y,cin,s,cout);
   input x,y,cin;
   output s,cout;
-  assign s = x^y;
-  assign cout = x&y;
+  assign s = x^y^cin;
+  assign cout = (x&y)|(x&cin)|(y&cin);
 endmodule
 
 module IIRfilter(clk,rst,a,x,y);
@@ -51,7 +51,7 @@ module IIRfilter(clk,rst,a,x,y);
         y_val <= x;
       end
       else begin
-        y_val <= x+booth_prod_actual[3:0];
+        y_val <= x+baugh_prod_actual[3:0];
       end
     end
   assign y = y_val;
