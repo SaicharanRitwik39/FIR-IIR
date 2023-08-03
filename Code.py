@@ -145,19 +145,22 @@ if(options == 'IIR Filter'):
     'Choose True for Analog Filter, False for Digital Filter',
     (True, False))
     
-    if (analog == True):
-        b, a = signal.iirfilter(N, Wn_signal, rs=rs,
-                           btype=btype, analog=analog, ftype=ftype)
-        w, h = signal.freqs(b, a, 1000)
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-        ax.semilogx(w / (2*np.pi), 20 * np.log10(np.maximum(abs(h), 1e-5)))
-        ax.set_xlabel('Frequency [Hz]')
-        ax.set_ylabel('Amplitude [dB]')
-        ax.axis((10, 1000, -100, 10))
-        ax.grid(which='both', axis='both')
-        ax.legend()
-        st.pyplot(fig)
+    if(analog == True):
+       if(ftype == 'cheby1' or ftype == 'cheby2' or ftype == 'ellip'):
+           b,a = signal.iirfilter(N, Wn_signal, rp=rp, rs=rs, btype=btype, analog=analog, ftype=ftype, output=output)
+           w,h = signal.freqs(b, a, 1000)
+           fig = plt.figure()
+           ax = fig.add_subplot(1, 1, 1)
+           ax.semilogx(w / (2*np.pi), 20 * np.log10(np.maximum(abs(h), 1e-5)))
+           ax.set_xlabel('Frequency [Hz]')
+           ax.set_ylabel('Amplitude [dB]')
+           ax.axis((10, 1000, -100, 10))
+           ax.grid(which='both', axis='both')
+           ax.legend()
+           st.pyplot(fig)
+    elif(analog == False):
+       if(ftype == 'cheby1' or ftype == 'cheby2' or ftype == 'ellip'):
+          st.write("Breh. Have to complete!")
 
     
 #FFT Code. Lines 123-.    
